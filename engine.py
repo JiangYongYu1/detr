@@ -69,6 +69,28 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     model.eval()
     criterion.eval()
 
+    input_data = [torch.rand((1, 3, 1312, 1312), dtype=torch.float32).cuda()]
+
+    from pth2onnx import ONNXExporter
+    onnx_path = "detr_simple.onnx"
+    onnx_export = ONNXExporter()
+    onnx_export.run_model(model, onnx_path, input_data, input_names=['images'],dynamic_axes=None,
+        output_names=["pred_logits", "pred_boxes"],tolerate_small_mismatch=True)
+
+    ONNXExporter.check_onnx(onnx_path)
+
+    # torch.onnx.export(
+    #     model,  # --dynamic only compatible with cpu
+    #     args=(input_data, ),
+    #     f=onnx_path,
+    #     verbose=False,
+    #     opset_version=12,
+    #     training=torch.onnx.TrainingMode.EVAL,
+    #     do_constant_folding=True,
+    #     input_names=['images'],
+    #     # output_names=['output_class', "output_box"],
+    # )
+
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('class_error', utils.SmoothedValue(window_size=1, fmt='{value:.2f}'))
     header = 'Test:'
