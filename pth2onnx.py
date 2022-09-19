@@ -107,7 +107,7 @@ class ONNXExporter:
         inputs = list(map(to_numpy, inputs))
         outputs = list(map(to_numpy, outputs))
 
-        ort_session = onnxruntime.InferenceSession(onnx_path)
+        ort_session = onnxruntime.InferenceSession(onnx_path, providers=['CPUExecutionProvider'])
         # compute onnxruntime output prediction
         ort_inputs = dict(
             (ort_session.get_inputs()[i].name, inpt) for i, inpt in enumerate(inputs)
