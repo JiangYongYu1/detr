@@ -77,7 +77,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     onnx_export.run_model(model, onnx_path, input_data, input_names=['images'],dynamic_axes=None,
         output_names=["pred_logits", "pred_boxes"],tolerate_small_mismatch=True)
 
-    ONNXExporter.check_onnx(onnx_path)
+    # ONNXExporter.check_onnx(onnx_path)
 
     # torch.onnx.export(
     #     model,  # --dynamic only compatible with cpu

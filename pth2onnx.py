@@ -10,6 +10,11 @@ import onnx_graphsurgeon as gs
 
 import torch
 
+from mmxdeploy.core import RewriterContext 
+from mmxdeploy.codebase.detr import *
+
+from torch.onnx.symbolic_registry import register_op
+
 
 class ONNXExporter:
     @classmethod
@@ -34,16 +39,18 @@ class ONNXExporter:
         # dynamic = {'images': {0: 'batch'}, 'pred_logits': {0: "batch"}, "pred_boxes": {0: "batch"}}
         # torch.onnx.export(model, inputs_list[0], onnx_io,
         #     input_names=input_names, output_names=output_names,do_constant_folding=True,training=False,opset_version=12)
-        torch.onnx.export(
-            model,
-            inputs_list[0],
-            onnx_path,
-            input_names=input_names,
-            output_names=output_names,
-            do_constant_folding=True,
-            training=False,
-            opset_version=12,
-        )
+        with RewriterContext(cfg={}, backend="default"), torch.no_grad():
+            torch.onnx.export(
+                model,
+                inputs_list[0],
+                onnx_path,
+                input_names=input_names,
+                output_names=output_names,
+                do_constant_folding=True,
+                training=False,
+                opset_version=11,
+                verbose=True
+            )
 
         import onnx
         import onnxsim
@@ -86,7 +93,7 @@ class ONNXExporter:
                 input_names=input_names,
                 output_names=output_names,
                 verbose=True,
-                opset_version=12,
+                opset_version=13,
             )
 
             print(
